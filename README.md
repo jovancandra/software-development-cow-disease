@@ -1,5 +1,6 @@
 # 🐄 Software Development: Sistem Deteksi Penyakit Kulit Pada Sapi
 
+
 ## 📌 Deskripsi Proyek
 
 Aplikasi ini merupakan sistem berbasis web yang dirancang untuk membantu peternak sapi dalam melakukan deteksi dini penyakit Lumpy Skin Disease (LSD) menggunakan citra gambar sapi.
