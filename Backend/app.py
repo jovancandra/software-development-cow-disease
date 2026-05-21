@@ -55,7 +55,6 @@ def extract_features(image_path):
     )
 
     return features
-
 # HALAMAN UTAMA
 @app.route('/', methods=['GET', 'POST'])
 def index():
