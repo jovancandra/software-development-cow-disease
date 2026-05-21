@@ -1,92 +1,230 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request
+import cv2
+import numpy as np
+from skimage.feature import hog
 import joblib
 import os
+import time
+
+# =========================
+# INISIALISASI FLASK
+# =========================
 
 app = Flask(__name__)
 
-# ===============================
-# LOAD MODEL
-# ===============================
-MODEL_PATH = 'model.pkl'
+# Folder upload
+UPLOAD_FOLDER = 'static/uploads'
 
-if not os.path.exists(MODEL_PATH):
-    raise FileNotFoundError("Model tidak ditemukan! Jalankan train_model.py dulu.")
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-model = joblib.load(MODEL_PATH)
+# Membuat folder uploads otomatis
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# Format file yang diizinkan
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# ===============================
-# ROUTE HOME
-# ===============================
-@app.route('/')
-def home():
-    return jsonify({
-        "message": "API Prediksi Penyakit Aktif",
-        "endpoint": "/predict (POST)"
-    })
+# =========================
+# LOAD MODEL MACHINE LEARNING
+# =========================
 
+model = joblib.load('model.pkl')
 
-# ===============================
-# VALIDASI INPUT
-# ===============================
-def validate_input(data):
-    required_fields = ['umur', 'suhu', 'batuk']
+# =========================
+# VALIDASI FORMAT FILE
+# =========================
 
-    for field in required_fields:
-        if field not in data:
-            return False, f"Field '{field}' wajib diisi"
+def allowed_file(filename):
 
-    try:
-        umur = int(data['umur'])
-        suhu = float(data['suhu'])
-        batuk = int(data['batuk'])
-    except:
-        return False, "Format input tidak valid (umur=int, suhu=float, batuk=int)"
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-    return True, (umur, suhu, batuk)
+# =========================
+# EKSTRAKSI FITUR HOG
+# =========================
 
+def extract_features(image_path):
 
-# ===============================
-# ENDPOINT PREDIKSI
-# ===============================
-@app.route('/predict', methods=['POST'])
-def predict():
-    try:
-        data = request.get_json()
+    # Membaca gambar
+    img = cv2.imread(image_path)
 
-        if not data:
-            return jsonify({"error": "Request harus dalam format JSON"}), 400
+    # Resize gambar lebih besar
+    img = cv2.resize(img, (256, 256))
 
-        # validasi
-        valid, result = validate_input(data)
-        if not valid:
-            return jsonify({"error": result}), 400
+    # Mengurangi noise gambar
+    img = cv2.GaussianBlur(img, (5, 5), 0)
 
-        umur, suhu, batuk = result
+    # Ubah ke grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # format input untuk model
-        input_data = [[umur, suhu, batuk]]
+    # Ekstraksi fitur HOG
+    features = hog(
+        gray,
+        orientations=9,
+        pixels_per_cell=(16, 16),
+        cells_per_block=(2, 2),
+        block_norm='L2-Hys'
+    )
 
-        # prediksi
-        prediction = model.predict(input_data)[0]
+    return features
 
-        return jsonify({
-            "input": {
-                "umur": umur,
-                "suhu": suhu,
-                "batuk": batuk
-            },
-            "prediksi": prediction
-        })
+# =========================
+# HALAMAN UTAMA
+# =========================
 
-    except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+@app.route('/', methods=['GET', 'POST'])
+def index():
 
+    prediction = None
+    image_path = None
+    error = None
+    confidence_text = None
 
-# ===============================
-# RUN SERVER
-# ===============================
+    # Jika tombol submit ditekan
+    if request.method == 'POST':
+
+        # Ambil file dari form
+        file = request.files['image']
+
+        # Jika file kosong
+        if file.filename == '':
+
+            error = "Silakan pilih gambar terlebih dahulu."
+
+        # Jika format file benar
+        elif file and allowed_file(file.filename):
+
+            # =========================
+            # HAPUS FILE LAMA
+            # =========================
+
+            for old_file in os.listdir(UPLOAD_FOLDER):
+
+                old_path = os.path.join(
+                    UPLOAD_FOLDER,
+                    old_file
+                )
+
+                try:
+                    os.remove(old_path)
+
+                except:
+                    pass
+
+            # =========================
+            # SIMPAN FILE BARU
+            # =========================
+
+            filepath = os.path.join(
+                app.config['UPLOAD_FOLDER'],
+                file.filename
+            )
+
+            file.save(filepath)
+
+            # =========================
+            # EKSTRAKSI FITUR
+            # =========================
+
+            features = extract_features(filepath)
+
+            # Ubah menjadi array numpy
+            features = np.array(features).reshape(1, -1)
+
+            # =========================
+            # LOADING AI
+            # =========================
+
+            time.sleep(2)
+
+            # =========================
+            # CONFIDENCE AI
+            # =========================
+
+            probabilities = model.predict_proba(features)[0]
+
+            confidence = max(probabilities)
+
+            confidence_percent = round(confidence * 100, 2)
+
+            confidence_text = (
+                f"Tingkat Keyakinan AI : "
+                f"{confidence_percent}%"
+            )
+
+            # =========================
+            # PREDIKSI AI
+            # =========================
+
+            result = model.predict(features)[0]
+
+            # =========================
+            # HASIL PREDIKSI
+            # =========================
+
+            # Jika AI terlalu ragu
+            if confidence < 0.65:
+
+                prediction = (
+                    "Gambar tidak dapat "
+                    "dikenali dengan jelas"
+                )
+
+            else:
+
+                # Sapi sehat
+                if result == 0:
+
+                    prediction = "Sapi Sehat"
+
+                # Sapi lumpy
+                elif result == 1:
+
+                    prediction = (
+                        "Sapi Terindikasi "
+                        "Lumpy Skin Disease"
+                    )
+
+                # Bukan sapi
+                else:
+
+                    prediction = (
+                        "Gambar bukan sapi "
+                        "atau tidak dikenali"
+                    )
+
+            # =========================
+            # TAMPILKAN GAMBAR
+            # =========================
+
+            image_path = filepath
+
+        # =========================
+        # FORMAT FILE SALAH
+        # =========================
+
+        else:
+
+            error = (
+                "Format file tidak didukung! "
+                "Gunakan JPG, JPEG, atau PNG."
+            )
+
+    # =========================
+    # RENDER WEBSITE
+    # =========================
+
+    return render_template(
+        'index.html',
+        prediction=prediction,
+        image_path=image_path,
+        error=error,
+        confidence_text=confidence_text
+    )
+
+# =========================
+# MENJALANKAN FLASK
+# =========================
+
 if __name__ == '__main__':
+
     app.run(debug=True)
