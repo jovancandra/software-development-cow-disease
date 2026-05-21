@@ -1,4 +1,5 @@
-# 🐄 Software Development: Sistem Deteksi Penyakit Lumpy Pada Sapi
+# 🐄 Software Development: Sistem Deteksi Penyakit Kulit Pada Sapi
+
 
 ## 📌 Deskripsi Proyek
 
