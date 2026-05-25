@@ -6,10 +6,7 @@ import joblib
 import os
 import time
 
-# =========================
 # INISIALISASI FLASK
-# =========================
-
 app = Flask(__name__)
 
 # Folder upload
@@ -23,24 +20,18 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Format file yang diizinkan
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# =========================
 # LOAD MODEL MACHINE LEARNING
-# =========================
 
 model = joblib.load('model.pkl')
 
-# =========================
 # VALIDASI FORMAT FILE
-# =========================
 
 def allowed_file(filename):
 
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# =========================
 # EKSTRAKSI FITUR HOG
-# =========================
 
 def extract_features(image_path):
 
@@ -67,10 +58,7 @@ def extract_features(image_path):
 
     return features
 
-# =========================
 # HALAMAN UTAMA
-# =========================
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
@@ -93,10 +81,7 @@ def index():
         # Jika format file benar
         elif file and allowed_file(file.filename):
 
-            # =========================
             # HAPUS FILE LAMA
-            # =========================
-
             for old_file in os.listdir(UPLOAD_FOLDER):
 
                 old_path = os.path.join(
@@ -110,9 +95,7 @@ def index():
                 except:
                     pass
 
-            # =========================
             # SIMPAN FILE BARU
-            # =========================
 
             filepath = os.path.join(
                 app.config['UPLOAD_FOLDER'],
@@ -121,25 +104,15 @@ def index():
 
             file.save(filepath)
 
-            # =========================
             # EKSTRAKSI FITUR
-            # =========================
-
             features = extract_features(filepath)
 
             # Ubah menjadi array numpy
             features = np.array(features).reshape(1, -1)
 
-            # =========================
             # LOADING AI
-            # =========================
-
             time.sleep(2)
-
-            # =========================
             # CONFIDENCE AI
-            # =========================
-
             probabilities = model.predict_proba(features)[0]
 
             confidence = max(probabilities)
@@ -151,15 +124,10 @@ def index():
                 f"{confidence_percent}%"
             )
 
-            # =========================
             # PREDIKSI AI
-            # =========================
-
             result = model.predict(features)[0]
 
-            # =========================
             # HASIL PREDIKSI
-            # =========================
 
             # Jika AI terlalu ragu
             if confidence < 0.65:
@@ -192,16 +160,12 @@ def index():
                         "atau tidak dikenali"
                     )
 
-            # =========================
             # TAMPILKAN GAMBAR
-            # =========================
 
             image_path = filepath
 
-        # =========================
+ 
         # FORMAT FILE SALAH
-        # =========================
-
         else:
 
             error = (
@@ -209,10 +173,7 @@ def index():
                 "Gunakan JPG, JPEG, atau PNG."
             )
 
-    # =========================
     # RENDER WEBSITE
-    # =========================
-
     return render_template(
         'index.html',
         prediction=prediction,
@@ -221,10 +182,7 @@ def index():
         confidence_text=confidence_text
     )
 
-# =========================
 # MENJALANKAN FLASK
-# =========================
-
 if __name__ == '__main__':
 
     app.run(debug=True)
