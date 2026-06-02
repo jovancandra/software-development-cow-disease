@@ -1,1 +1,285 @@
-<h1>Frontend</h1>
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Sistem Deteksi Penyakit Lumpy</title>
+
+    <link rel="stylesheet"
+          href="styles.css">
+          
+
+</head>
+
+<body>
+
+<!-- LOADING -->
+
+<div class="loading-overlay" id="loading">
+
+    <div class="spinner"></div>
+
+    <div class="loading-text">
+
+        file gambar sedang dianalisis AI...
+
+    </div>
+
+</div>
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <h2>LumpyDetect AI</h2>
+
+    <ul>
+
+        <li>Beranda</li>
+        <li>Deteksi</li>
+        <li>Informasi</li>
+
+    </ul>
+
+</nav>
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+
+            Sistem Deteksi Penyakit
+            Lumpy Pada Sapi
+
+        </h1>
+
+        <p>
+
+            Website berbasis Artificial Intelligence
+            untuk membantu peternak mendeteksi
+            penyakit kulit sapi secara cepat dan akurat.
+
+        </p>
+
+    </div>
+
+</section>
+
+<!-- CONTENT -->
+
+<div class="container">
+
+    <!-- UPLOAD -->
+
+    <div class="card upload-section">
+
+        <h2>Upload Gambar Sapi</h2>
+
+        <p class="upload-text">
+
+            Silakan upload foto sapi dengan jelas
+            agar sistem AI dapat mendeteksi penyakit
+            dengan lebih akurat.
+
+        </p>
+
+        <form method="POST"
+      enctype="multipart/form-data"
+      id="uploadForm">
+
+    <!-- PILIH FILE / KAMERA HP -->
+
+    <input type="file"
+           name="image"
+           id="imageInput"
+           accept="image/*"
+           capture="environment"
+           required>
+
+    <br><br>
+
+    <!-- BUTTON DETEKSI -->
+
+    <button type="submit">
+
+        Deteksi Penyakit
+
+    </button>
+
+</form>
+
+        <!-- ERROR -->
+
+        {% if error %}
+
+        <div class="error-message">
+
+            {{ error }}
+
+        </div>
+
+        {% endif %}
+
+        <!-- IMAGE -->
+
+        {% if image_path %}
+
+        <div class="image-preview">
+
+            <h2>Hasil Upload Gambar</h2>
+
+            <img src="{{ image_path }}">
+
+        </div>
+
+        {% endif %}
+
+        <!-- RESULT -->
+
+        {% if prediction %}
+
+        <div class="
+        {% if 'Lumpy' in prediction %}
+        result-danger
+
+        {% elif 'Sehat' in prediction %}
+        result-success
+
+        {% else %}
+        result-unknown
+
+        {% endif %}
+        ">
+
+            {{ prediction }}
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- EDUKASI -->
+
+    <div class="info-grid">
+
+        <div class="info-box">
+
+            <h3>
+                Apa Itu Penyakit Lumpy?
+            </h3>
+
+            <p>
+
+                Lumpy Skin Disease merupakan
+                penyakit kulit pada sapi yang
+                disebabkan oleh virus dan dapat
+                menular antar ternak.
+
+            </p>
+
+        </div>
+
+        <div class="info-box">
+
+            <h3>
+                Gejala Penyakit
+            </h3>
+
+            <ul>
+
+                <li>Muncul benjolan pada kulit</li>
+
+                <li>Sapi mengalami demam</li>
+
+                <li>Nafsu makan menurun</li>
+
+                <li>Berat badan turun</li>
+
+                <li>Kulit luka dan mengeras</li>
+
+            </ul>
+
+        </div>
+
+        <div class="info-box">
+
+            <h3>
+                Cara Pencegahan
+            </h3>
+
+            <ul>
+
+                <li>Menjaga kebersihan kandang</li>
+
+                <li>Melakukan vaksinasi rutin</li>
+
+                <li>Menghindari gigitan serangga</li>
+
+                <li>Memisahkan sapi sakit</li>
+
+                <li>Pemeriksaan kesehatan rutin</li>
+
+            </ul>
+
+        </div>
+
+        <div class="info-box">
+
+            <h3>
+                Cara Penanganan
+            </h3>
+
+            <ul>
+
+                <li>Segera hubungi dokter hewan</li>
+
+                <li>Membersihkan luka sapi</li>
+
+                <li>Pemberian vitamin</li>
+
+                <li>Isolasi sapi yang sakit</li>
+
+                <li>Menjaga kebersihan kandang</li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+
+<footer>
+
+    Sistem Deteksi Penyakit Lumpy Pada Sapi © 2026
+
+</footer>
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+    // LOADING SCREEN
+
+    const form =
+    document.getElementById('uploadForm');
+
+    form.addEventListener('submit', function(){
+
+        document.getElementById('loading')
+        .style.display = 'flex';
+
+    });
+
+</script>
