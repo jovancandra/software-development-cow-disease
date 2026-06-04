@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import cv2
 import numpy as np
 from skimage.feature import hog
@@ -6,16 +6,14 @@ import joblib
 import os
 import time
 
+# =========================
 # INISIALISASI FLASK
-<<<<<<< HEAD:Backend/app.py
+# =========================
 
-=======
->>>>>>> origin/main:backend/app.py
 app = Flask(__name__)
 
 # Folder upload
 UPLOAD_FOLDER = 'static/uploads'
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Membuat folder uploads otomatis
@@ -24,43 +22,41 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Format file yang diizinkan
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# LOAD MODEL MACHINE LEARNING
-<<<<<<< HEAD:Backend/app.py
-model = joblib.load('model.pkl')
+# =========================
+# LOAD MODEL
+# =========================
 
-# VALIDASI FORMAT FILE
-=======
+model = joblib.load('backend/model.pkl')
 
-model = joblib.load('model.pkl')
+# =========================
+# VALIDASI FILE
+# =========================
 
-# VALIDASI FORMAT FILE
-
->>>>>>> origin/main:backend/app.py
 def allowed_file(filename):
 
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return (
+        '.' in filename and
+        filename.rsplit('.', 1)[1].lower()
+        in ALLOWED_EXTENSIONS
+    )
 
+# =========================
 # EKSTRAKSI FITUR HOG
-<<<<<<< HEAD:Backend/app.py
-=======
+# =========================
 
->>>>>>> origin/main:backend/app.py
 def extract_features(image_path):
 
-    # Membaca gambar
     img = cv2.imread(image_path)
 
-    # Resize gambar lebih besar
     img = cv2.resize(img, (256, 256))
 
-    # Mengurangi noise gambar
     img = cv2.GaussianBlur(img, (5, 5), 0)
 
-    # Ubah ke grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(
+        img,
+        cv2.COLOR_BGR2GRAY
+    )
 
-    # Ekstraksi fitur HOG
     features = hog(
         gray,
         orientations=9,
@@ -70,11 +66,11 @@ def extract_features(image_path):
     )
 
     return features
-<<<<<<< HEAD:Backend/app.py
-=======
 
->>>>>>> origin/main:backend/app.py
-# HALAMAN UTAMA
+# =========================
+# WEBSITE UTAMA
+# =========================
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
@@ -83,39 +79,36 @@ def index():
     error = None
     confidence_text = None
 
-    # Jika tombol submit ditekan
     if request.method == 'POST':
 
-        # Ambil file dari form
         file = request.files['image']
 
-        # Jika file kosong
         if file.filename == '':
 
-            error = "Silakan pilih gambar terlebih dahulu."
+            error = (
+                "Silakan pilih gambar terlebih dahulu."
+            )
 
-        # Jika format file benar
         elif file and allowed_file(file.filename):
 
-            # HAPUS FILE LAMA
-            for old_file in os.listdir(UPLOAD_FOLDER):
-
-                old_path = os.path.join(
-                    UPLOAD_FOLDER,
-                    old_file
-                )
+            # Hapus file lama
+            for old_file in os.listdir(
+                UPLOAD_FOLDER
+            ):
 
                 try:
-                    os.remove(old_path)
+
+                    os.remove(
+                        os.path.join(
+                            UPLOAD_FOLDER,
+                            old_file
+                        )
+                    )
 
                 except:
                     pass
 
-            # SIMPAN FILE BARU
-<<<<<<< HEAD:Backend/app.py
-=======
-
->>>>>>> origin/main:backend/app.py
+            # Simpan file baru
             filepath = os.path.join(
                 app.config['UPLOAD_FOLDER'],
                 file.filename
@@ -123,40 +116,42 @@ def index():
 
             file.save(filepath)
 
-            # EKSTRAKSI FITUR
-            features = extract_features(filepath)
+            # Ekstraksi fitur
+            features = extract_features(
+                filepath
+            )
 
-            # Ubah menjadi array numpy
-            features = np.array(features).reshape(1, -1)
-<<<<<<< HEAD:Backend/app.py
- 
-=======
+            features = np.array(
+                features
+            ).reshape(1, -1)
 
->>>>>>> origin/main:backend/app.py
-            # LOADING AI
+            # Simulasi loading
             time.sleep(2)
-            # CONFIDENCE AI
-            probabilities = model.predict_proba(features)[0]
 
-            confidence = max(probabilities)
+            # Confidence
+            probabilities = model.predict_proba(
+                features
+            )[0]
 
-            confidence_percent = round(confidence * 100, 2)
+            confidence = max(
+                probabilities
+            )
+
+            confidence_percent = round(
+                confidence * 100,
+                2
+            )
 
             confidence_text = (
-                f"Tingkat Keyakinan AI : "
+                f"Tingkat Keyakinan AI: "
                 f"{confidence_percent}%"
             )
 
-            # PREDIKSI AI
-            result = model.predict(features)[0]
-<<<<<<< HEAD:Backend/app.py
-            
-=======
+            # Prediksi
+            result = model.predict(
+                features
+            )[0]
 
-            # HASIL PREDIKSI
-
->>>>>>> origin/main:backend/app.py
-            # Jika AI terlalu ragu
             if confidence < 0.65:
 
                 prediction = (
@@ -166,12 +161,12 @@ def index():
 
             else:
 
-                # Sapi sehat
                 if result == 0:
 
-                    prediction = "Sapi Sehat"
+                    prediction = (
+                        "Sapi Sehat"
+                    )
 
-                # Sapi lumpy
                 elif result == 1:
 
                     prediction = (
@@ -179,7 +174,6 @@ def index():
                         "Lumpy Skin Disease"
                     )
 
-                # Bukan sapi
                 else:
 
                     prediction = (
@@ -187,25 +181,15 @@ def index():
                         "atau tidak dikenali"
                     )
 
-            # TAMPILKAN GAMBAR
-<<<<<<< HEAD:Backend/app.py
             image_path = filepath
 
-=======
-
-            image_path = filepath
-
- 
->>>>>>> origin/main:backend/app.py
-        # FORMAT FILE SALAH
         else:
 
             error = (
-                "Format file tidak didukung! "
+                "Format file tidak didukung. "
                 "Gunakan JPG, JPEG, atau PNG."
             )
 
-    # RENDER WEBSITE
     return render_template(
         'index.html',
         prediction=prediction,
@@ -214,7 +198,70 @@ def index():
         confidence_text=confidence_text
     )
 
-# MENJALANKAN FLASK
+# =========================
+# API DIAGNOSIS
+# =========================
+
+@app.route('/diagnosis', methods=['POST'])
+def diagnosis():
+
+    file = request.files.get('image')
+
+    if not file:
+
+        return jsonify({
+            "status": "error",
+            "message": "Gambar tidak ditemukan"
+        }), 400
+
+    filepath = os.path.join(
+        app.config['UPLOAD_FOLDER'],
+        file.filename
+    )
+
+    file.save(filepath)
+
+    features = extract_features(
+        filepath
+    )
+
+    features = np.array(
+        features
+    ).reshape(1, -1)
+
+    result = model.predict(
+        features
+    )[0]
+
+    if result == 0:
+
+        hasil = "Sapi Sehat"
+
+    elif result == 1:
+
+        hasil = (
+            "Sapi Terindikasi "
+            "Lumpy Skin Disease"
+        )
+
+    else:
+
+        hasil = (
+            "Bukan Sapi"
+        )
+
+    return jsonify({
+
+        "status": "success",
+
+        "hasil_diagnosis": hasil
+
+    })
+
+# =========================
+# JALANKAN FLASK
+# =========================
+
 if __name__ == '__main__':
 
     app.run(debug=True)
