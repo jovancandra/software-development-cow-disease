@@ -190,7 +190,7 @@ def index():
                 "Gunakan JPG, JPEG, atau PNG."
             )
 
-    return render_template(
+    return render_template( 
         'index.html',
         prediction=prediction,
         image_path=image_path,
