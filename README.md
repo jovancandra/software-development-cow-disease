@@ -1,95 +1,93 @@
-# 🐄 Software Development: Sistem Deteksi Penyakit Kulit Pada Sapi
-
+# 🐄 Sistem Deteksi Lumpy Skin Disease pada Sapi Berbasis Web
 
 ## 📌 Deskripsi Proyek
 
-Aplikasi ini merupakan sistem berbasis web yang dirancang untuk membantu peternak sapi dalam melakukan deteksi dini penyakit Lumpy Skin Disease (LSD) menggunakan citra gambar sapi.
+Aplikasi ini merupakan sistem berbasis web yang dirancang untuk membantu peternak sapi dalam melakukan deteksi dini penyakit **Lumpy Skin Disease (LSD)** menggunakan citra gambar sapi.
 
-Sistem bekerja dengan cara menganalisis gambar yang diupload oleh pengguna menggunakan metode Machine Learning sehingga dapat memberikan hasil deteksi secara cepat dan mudah dipahami.
+Sistem bekerja dengan cara menganalisis gambar yang diunggah oleh pengguna menggunakan metode **Machine Learning**, sehingga dapat memberikan hasil deteksi secara cepat dan mudah dipahami.
 
-Aplikasi ini dapat digunakan tanpa proses login (zero-authentication) sehingga lebih cepat diakses oleh peternak di lapangan.
+Aplikasi ini dapat digunakan tanpa proses login (**zero-authentication**) sehingga pengguna dapat langsung mengakses fitur deteksi.
 
 ---
 
-# 🎯 Tujuan
+## 🎯 Tujuan
 
 - Membantu deteksi dini penyakit Lumpy Skin Disease pada sapi
-- Memberikan edukasi kepada peternak
-- Mengurangi risiko penyebaran penyakit ternak
+- Memberikan informasi edukasi kepada peternak
+- Mengurangi risiko keterlambatan penanganan penyakit ternak
 - Menyediakan sistem deteksi berbasis Artificial Intelligence
 - Mempermudah proses pemeriksaan awal kesehatan sapi
 
 ---
 
-# 🚀 Fitur Utama
+## 🚀 Fitur Utama
 
 - Upload gambar sapi
-- Deteksi otomatis menggunakan Artificial Intelligence
+- Deteksi otomatis menggunakan Machine Learning
 - Hasil prediksi penyakit sapi
-- Identifikasi sapi sehat / terindikasi Lumpy
+- Identifikasi gambar:
+  - Sapi sehat
+  - Sapi terindikasi Lumpy Skin Disease
+  - Gambar non-sapi
 - Validasi gambar non-sapi
-- Tampilan website responsif dan mudah digunakan
-- Loading proses analisis AI
-- Informasi edukasi penyakit Lumpy
+- Tampilan website sederhana dan mudah digunakan
+- Informasi edukasi penyakit Lumpy Skin Disease
+- Rekomendasi penanganan awal
 
 ---
 
-# 📊 Alur Sistem
+## 📊 Alur Sistem
 
 1. Pengguna membuka website
-2. Pengguna mengupload gambar sapi
-3. Sistem memproses gambar menggunakan Machine Learning
-4. Sistem melakukan ekstraksi fitur citra
-5. AI melakukan prediksi penyakit
-6. Hasil deteksi ditampilkan kepada pengguna
-7. Sistem memberikan informasi penanganan dan pencegahan
+2. Pengguna mengunggah gambar sapi
+3. Frontend mengirim gambar ke backend
+4. Backend menerima dan memproses gambar
+5. Sistem melakukan preprocessing dan ekstraksi fitur citra
+6. Model Machine Learning melakukan prediksi
+7. Backend mengirim hasil prediksi ke frontend
+8. Frontend menampilkan hasil deteksi dan informasi penanganan awal
 
 ---
 
-# 🏗️ Arsitektur Sistem
+## 🏗️ Arsitektur Sistem
 
-## 1. Frontend (User Interface)
+### 1. Frontend
 
-Menampilkan tampilan website untuk upload gambar, hasil deteksi, dan informasi edukasi penyakit.
+Frontend digunakan sebagai antarmuka pengguna untuk mengunggah gambar, menampilkan proses analisis, dan menampilkan hasil deteksi.
 
-## 2. Backend (Flask API)
+### 2. Backend
 
-Memproses gambar upload pengguna dan menjalankan model Machine Learning untuk prediksi penyakit.
+Backend menggunakan Flask API untuk menerima gambar dari frontend, memproses gambar, menjalankan model Machine Learning, dan mengirimkan hasil prediksi.
 
-## 3. Machine Learning Model
+### 3. Machine Learning Model
 
-Model Decision Tree digunakan untuk melakukan klasifikasi gambar sapi sehat, sapi terindikasi Lumpy, dan gambar non-sapi.
+Model Machine Learning digunakan untuk melakukan klasifikasi gambar. Model yang digunakan adalah **Decision Tree** dengan ekstraksi fitur citra menggunakan **HOG Feature Extraction**.
 
-## 4. Dataset
+### 4. Dataset
 
-Dataset berisi gambar:
+Dataset digunakan untuk melatih model klasifikasi citra. Dataset terdiri dari gambar sapi sehat, sapi terkena Lumpy Skin Disease, dan gambar non-sapi.
 
-- Sapi sehat
-- Sapi terkena Lumpy Skin Disease
-- Gambar non-sapi
+Dataset tidak disimpan langsung di repository karena ukuran file yang besar. Link dataset tersedia pada folder `dataset/README.md`.
 
 ---
 
-# 🛠️ Teknologi yang Digunakan
+## 🛠️ Teknologi yang Digunakan
 
-## Frontend
-
+### Frontend
 - HTML
 - CSS
 - JavaScript
 
-## Backend
+### Backend
+- Python
+- Flask
 
-- Python Flask
-
-## Machine Learning
-
+### Machine Learning
 - Scikit-learn
 - Decision Tree
 - HOG Feature Extraction
 
-## Library Pendukung
-
+### Library Pendukung
 - OpenCV
 - NumPy
 - Joblib
@@ -97,27 +95,29 @@ Dataset berisi gambar:
 
 ---
 
-# 📂 Struktur Folder
+## 📂 Struktur Folder
 
-```plaintext
-project_lumpy/
+```text
+software-development-cow-disease/
+│
+├── backend/
+│   ├── app.py
+│   ├── model.pkl
+│   ├── train_model.py
+│   ├── training_model.ipynb
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+│   └── WireframeUI/
 │
 ├── dataset/
-│   ├── healthycows/
-│   ├── lumpycows/
-│   └── noncows/
+│   └── README.md
 │
-├── static/
-│   ├── uploads/
-│   ├── style.css
-│   └── sapifoto.jpeg
+├── docs/
+│   └── Proposal Software Development.docx
 │
-├── templates/
-│   └── index.html
-│
-├── app.py
-├── model.pkl
-├── training_model.ipynb
-├── train_model.py
-│
-└── README.md
+├── README.md
+└── .gitignore
