@@ -7,6 +7,10 @@ import os
 import time
 
 # INISIALISASI FLASK
+<<<<<<< HEAD:Backend/app.py
+
+=======
+>>>>>>> origin/main:backend/app.py
 app = Flask(__name__)
 
 # Folder upload
@@ -21,18 +25,27 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # LOAD MODEL MACHINE LEARNING
+<<<<<<< HEAD:Backend/app.py
+model = joblib.load('model.pkl')
+
+# VALIDASI FORMAT FILE
+=======
 
 model = joblib.load('model.pkl')
 
 # VALIDASI FORMAT FILE
 
+>>>>>>> origin/main:backend/app.py
 def allowed_file(filename):
 
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # EKSTRAKSI FITUR HOG
+<<<<<<< HEAD:Backend/app.py
+=======
 
+>>>>>>> origin/main:backend/app.py
 def extract_features(image_path):
 
     # Membaca gambar
@@ -57,7 +70,10 @@ def extract_features(image_path):
     )
 
     return features
+<<<<<<< HEAD:Backend/app.py
+=======
 
+>>>>>>> origin/main:backend/app.py
 # HALAMAN UTAMA
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -96,7 +112,10 @@ def index():
                     pass
 
             # SIMPAN FILE BARU
+<<<<<<< HEAD:Backend/app.py
+=======
 
+>>>>>>> origin/main:backend/app.py
             filepath = os.path.join(
                 app.config['UPLOAD_FOLDER'],
                 file.filename
@@ -109,7 +128,11 @@ def index():
 
             # Ubah menjadi array numpy
             features = np.array(features).reshape(1, -1)
+<<<<<<< HEAD:Backend/app.py
+ 
+=======
 
+>>>>>>> origin/main:backend/app.py
             # LOADING AI
             time.sleep(2)
             # CONFIDENCE AI
@@ -126,9 +149,13 @@ def index():
 
             # PREDIKSI AI
             result = model.predict(features)[0]
+<<<<<<< HEAD:Backend/app.py
+            
+=======
 
             # HASIL PREDIKSI
 
+>>>>>>> origin/main:backend/app.py
             # Jika AI terlalu ragu
             if confidence < 0.65:
 
@@ -161,10 +188,15 @@ def index():
                     )
 
             # TAMPILKAN GAMBAR
+<<<<<<< HEAD:Backend/app.py
+            image_path = filepath
+
+=======
 
             image_path = filepath
 
  
+>>>>>>> origin/main:backend/app.py
         # FORMAT FILE SALAH
         else:
 
