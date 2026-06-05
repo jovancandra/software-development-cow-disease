@@ -6,7 +6,7 @@ import joblib
 import os
 import time
 
-# INISIALISASI FLASK
+
 app = Flask(__name__)
 
 # Folder upload
@@ -21,6 +21,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # LOAD MODEL MACHINE LEARNING
+
 
 model = joblib.load('model.pkl')
 
