@@ -6,49 +6,102 @@ import joblib
 import os
 import time
 
+# =========================
+# PATH PROJECT
+# =========================
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Folder upload
-UPLOAD_FOLDER = 'static/uploads'
+TEMPLATE_DIR = os.path.join(
+    BASE_DIR,
+    '..',
+    'frontend',
+    'templates'
+)
+
+UPLOAD_FOLDER = os.path.join(
+    BASE_DIR,
+    'static',
+    'uploads'
+)
+
+# =========================
+# FLASK APP
+# =========================
+
+app = Flask(
+    __name__,
+    template_folder=TEMPLATE_DIR
+)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Membuat folder uploads otomatis
+# Buat folder uploads otomatis
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Format file yang diizinkan
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+# =========================
+# FORMAT FILE
+# =========================
 
-# LOAD MODEL MACHINE LEARNING
+ALLOWED_EXTENSIONS = {
+    'png',
+    'jpg',
+    'jpeg'
+}
 
+# =========================
+# LOAD MODEL
+# =========================
 
-model = joblib.load('model.pkl')
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    'model.pkl'
+)
 
-# VALIDASI FORMAT FILE
+model = joblib.load(MODEL_PATH)
+
+# =========================
+# VALIDASI FILE
+# =========================
 
 def allowed_file(filename):
 
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return (
+        '.' in filename
+        and
+        filename.rsplit('.', 1)[1].lower()
+        in ALLOWED_EXTENSIONS
+    )
 
-# EKSTRAKSI FITUR HOG
+# =========================
+# EKSTRAKSI HOG
+# =========================
 
 def extract_features(image_path):
 
-    # Membaca gambar
     img = cv2.imread(image_path)
 
-    # Resize gambar lebih besar
-    img = cv2.resize(img, (256, 256))
+    if img is None:
+        raise ValueError(
+            f"Gagal membaca gambar: {image_path}"
+        )
 
-    # Mengurangi noise gambar
-    img = cv2.GaussianBlur(img, (5, 5), 0)
+    img = cv2.resize(
+        img,
+        (256, 256)
+    )
 
-    # Ubah ke grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.GaussianBlur(
+        img,
+        (5, 5),
+        0
+    )
 
-    # Ekstraksi fitur HOG
+    gray = cv2.cvtColor(
+        img,
+        cv2.COLOR_BGR2GRAY
+    )
+
     features = hog(
         gray,
         orientations=9,
@@ -59,7 +112,10 @@ def extract_features(image_path):
 
     return features
 
+# =========================
 # HALAMAN UTAMA
+# =========================
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
@@ -68,69 +124,86 @@ def index():
     error = None
     confidence_text = None
 
-    # Jika tombol submit ditekan
     if request.method == 'POST':
 
-        # Ambil file dari form
+        if 'image' not in request.files:
+
+            error = "File tidak ditemukan"
+
+            return render_template(
+                'index.html',
+                prediction=prediction,
+                image_path=image_path,
+                error=error,
+                confidence_text=confidence_text
+            )
+
         file = request.files['image']
 
-        # Jika file kosong
         if file.filename == '':
 
-            error = "Silakan pilih gambar terlebih dahulu."
+            error = (
+                "Silakan pilih gambar terlebih dahulu."
+            )
 
-        # Jika format file benar
         elif file and allowed_file(file.filename):
 
-            # HAPUS FILE LAMA
-            for old_file in os.listdir(UPLOAD_FOLDER):
-
-                old_path = os.path.join(
-                    UPLOAD_FOLDER,
-                    old_file
-                )
+            # Hapus file lama
+            for old_file in os.listdir(
+                UPLOAD_FOLDER
+            ):
 
                 try:
-                    os.remove(old_path)
+
+                    os.remove(
+                        os.path.join(
+                            UPLOAD_FOLDER,
+                            old_file
+                        )
+                    )
 
                 except:
                     pass
 
-            # SIMPAN FILE BARU
-
             filepath = os.path.join(
-                app.config['UPLOAD_FOLDER'],
+                UPLOAD_FOLDER,
                 file.filename
             )
 
             file.save(filepath)
 
-            # EKSTRAKSI FITUR
-            features = extract_features(filepath)
+            features = extract_features(
+                filepath
+            )
 
-            # Ubah menjadi array numpy
-            features = np.array(features).reshape(1, -1)
+            features = np.array(
+                features
+            ).reshape(1, -1)
 
-            # LOADING AI
             time.sleep(2)
-            # CONFIDENCE AI
-            probabilities = model.predict_proba(features)[0]
 
-            confidence = max(probabilities)
+            probabilities = model.predict_proba(
+                features
+            )[0]
 
-            confidence_percent = round(confidence * 100, 2)
+            confidence = max(
+                probabilities
+            )
+
+            confidence_percent = round(
+                confidence * 100,
+                2
+            )
 
             confidence_text = (
                 f"Tingkat Keyakinan AI : "
                 f"{confidence_percent}%"
             )
 
-            # PREDIKSI AI
-            result = model.predict(features)[0]
+            result = model.predict(
+                features
+            )[0]
 
-            # HASIL PREDIKSI
-
-            # Jika AI terlalu ragu
             if confidence < 0.65:
 
                 prediction = (
@@ -140,12 +213,12 @@ def index():
 
             else:
 
-                # Sapi sehat
                 if result == 0:
 
-                    prediction = "Sapi Sehat"
+                    prediction = (
+                        "Sapi Sehat"
+                    )
 
-                # Sapi lumpy
                 elif result == 1:
 
                     prediction = (
@@ -153,7 +226,6 @@ def index():
                         "Lumpy Skin Disease"
                     )
 
-                # Bukan sapi
                 else:
 
                     prediction = (
@@ -161,20 +233,19 @@ def index():
                         "atau tidak dikenali"
                     )
 
-            # TAMPILKAN GAMBAR
+            image_path = os.path.join(
+                'static',
+                'uploads',
+                file.filename
+            )
 
-            image_path = filepath
-
- 
-        # FORMAT FILE SALAH
         else:
 
             error = (
-                "Format file tidak didukung! "
+                "Format file tidak didukung. "
                 "Gunakan JPG, JPEG, atau PNG."
             )
 
-    # RENDER WEBSITE
     return render_template(
         'index.html',
         prediction=prediction,
@@ -183,7 +254,16 @@ def index():
         confidence_text=confidence_text
     )
 
-# MENJALANKAN FLASK
+# =========================
+# JALANKAN FLASK
+# =========================
+
 if __name__ == '__main__':
+
+    print("Template Folder:")
+    print(TEMPLATE_DIR)
+
+    print("Model Path:")
+    print(MODEL_PATH)
 
     app.run(debug=True)
