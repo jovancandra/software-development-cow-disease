@@ -22,18 +22,14 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Format file yang diizinkan
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# =========================
-# LOAD MODEL
-# =========================
-
+# LOAD MODEL MACHINE LEARNING
 model = joblib.load('backend/model.pkl')
 
 # =========================
-# VALIDASI FILE
+# VALIDASI FORMAT FILE
 # =========================
 
 def allowed_file(filename):
-
     return (
         '.' in filename and
         filename.rsplit('.', 1)[1].lower()
@@ -68,7 +64,7 @@ def extract_features(image_path):
     return features
 
 # =========================
-# WEBSITE UTAMA
+# HALAMAN UTAMA
 # =========================
 
 @app.route('/', methods=['GET', 'POST'])
@@ -95,20 +91,17 @@ def index():
             for old_file in os.listdir(
                 UPLOAD_FOLDER
             ):
-
                 try:
-
                     os.remove(
                         os.path.join(
                             UPLOAD_FOLDER,
                             old_file
                         )
                     )
-
                 except:
                     pass
 
-            # Simpan file baru
+            # SIMPAN FILE BARU
             filepath = os.path.join(
                 app.config['UPLOAD_FOLDER'],
                 file.filename
@@ -116,16 +109,13 @@ def index():
 
             file.save(filepath)
 
-            # Ekstraksi fitur
-            features = extract_features(
-                filepath
-            )
+            # EKSTRAKSI FITUR
+            features = extract_features(filepath)
 
-            features = np.array(
-                features
-            ).reshape(1, -1)
+            # Ubah menjadi array numpy
+            features = np.array(features).reshape(1, -1)
 
-            # Simulasi loading
+            # LOADING AI
             time.sleep(2)
 
             # Confidence
@@ -147,10 +137,8 @@ def index():
                 f"{confidence_percent}%"
             )
 
-            # Prediksi
-            result = model.predict(
-                features
-            )[0]
+            # PREDIKSI AI
+            result = model.predict(features)[0]
 
             if confidence < 0.65:
 
@@ -181,6 +169,7 @@ def index():
                         "atau tidak dikenali"
                     )
 
+            # TAMPILKAN GAMBAR
             image_path = filepath
 
         else:
@@ -190,7 +179,7 @@ def index():
                 "Gunakan JPG, JPEG, atau PNG."
             )
 
-    return render_template( 
+    return render_template(
         'index.html',
         prediction=prediction,
         image_path=image_path,
@@ -263,5 +252,4 @@ def diagnosis():
 # =========================
 
 if __name__ == '__main__':
-
-    app.run(debug=True) 
+    app.run(debug=True)
