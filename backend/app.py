@@ -7,7 +7,7 @@ import os
 import time
 
 # =========================
-# INISIALISASI FLASK
+# INISIALISASI FLASK Ebim
 # =========================
 
 app = Flask(__name__)
@@ -23,7 +23,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # LOAD MODEL MACHINE LEARNING
-model = joblib.load('backend/model.pkl')
+model = joblib.load('model.pkl')
 
 # =========================
 # VALIDASI FORMAT FILE
