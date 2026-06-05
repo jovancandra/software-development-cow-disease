@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Flask
+uploads/
+backend/uploads/
+
+# Dataset besar
+*.zip
+*.rar
+*.7z
+
+# Editor
+.vscode/
+.DS_Store
