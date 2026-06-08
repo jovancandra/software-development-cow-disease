@@ -18,7 +18,12 @@ TEMPLATE_DIR = os.path.join(
     'frontend',
     'templates'
 )
-
+STATIC_DIR = os.path.join(
+    BASE_DIR,
+    '..',
+    'frontend',
+    'STATIC'
+)
 UPLOAD_FOLDER = os.path.join(
     BASE_DIR,
     'static',
