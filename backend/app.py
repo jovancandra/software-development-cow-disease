@@ -22,8 +22,9 @@ STATIC_DIR = os.path.join(
     BASE_DIR,
     '..',
     'frontend',
-    'STATIC'
+    'static'
 )
+
 UPLOAD_FOLDER = os.path.join(
     BASE_DIR,
     'static',
@@ -36,7 +37,8 @@ UPLOAD_FOLDER = os.path.join(
 
 app = Flask(
     __name__,
-    template_folder=TEMPLATE_DIR
+    template_folder=TEMPLATE_DIR,
+    static_folder=STATIC_DIR
 )
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
