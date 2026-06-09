@@ -27,6 +27,8 @@ STATIC_DIR = os.path.join(
 
 UPLOAD_FOLDER = os.path.join(
     BASE_DIR,
+    '..',
+    'frontend',
     'static',
     'uploads'
 )
@@ -178,6 +180,8 @@ def index():
             )
 
             file.save(filepath)
+            print("File tersimpan:", filepath)
+            print("Ada file:", os.path.exists(filepath))
 
             features = extract_features(
                 filepath
@@ -240,12 +244,7 @@ def index():
                         "atau tidak dikenali"
                     )
 
-            image_path = os.path.join(
-                'static',
-                'uploads',
-                file.filename
-            )
-
+            image_path = f"/static/uploads/{file.filename}"
         else:
 
             error = (
