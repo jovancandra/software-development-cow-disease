@@ -272,4 +272,8 @@ if __name__ == '__main__':
     print("Model Path:")
     print(MODEL_PATH)
 
-    app.run(debug=True)
+    app.run(
+        host='0.0.0.0',
+        port=5000,
+        debug=True
+    )
