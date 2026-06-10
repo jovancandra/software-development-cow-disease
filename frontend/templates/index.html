@@ -83,42 +83,83 @@
             </p>
 
             <form method="POST"
-                  enctype="multipart/form-data"
-                  id="uploadForm">
+      enctype="multipart/form-data"
+      id="uploadForm">
 
-                <!-- INPUT FILE -->
+    <!-- INPUT TERSEMBUNYI -->
 
-                <input type="file"
-                       name="image"
-                       accept="image/*"
-                       capture="environment">
+    <input type="file"
+           id="cameraInput"
+           name="image"
+           accept="image/*"
+           capture="environment"
+           hidden>
 
-                <input type="file"
-                       name="image"
-                       id="imageInput"
-                       accept="image/*"
-                       required
-                       style="display:none;">
+    <input type="file"
+           id="galleryInput"
+           accept="image/*"
+           hidden>
 
-                <!-- BUTTON PILIH GAMBAR -->
+    <!-- TOMBOL UPLOAD -->
 
-                <label for="imageInput" class="custom-upload-btn">
-                    📷 Pilih Gambar (Kamera / Galeri / File)
-                </label>
+    <button type="button"
+            class="custom-upload-btn"
+            onclick="openModal()">
 
-                <p id="selectedFile" class="selected-file">
-                    Belum ada file dipilih
-                </p>
+        📷 Upload Gambar
 
-                <br>
+    </button>
 
-                <!-- BUTTON DETEKSI -->
+    <p id="selectedFile" class="selected-file">
 
-                <button type="submit">
-                    Deteksi Penyakit
-                </button>
+        Belum ada file dipilih
 
-            </form>
+    </p>
+
+    <br>
+
+    <!-- BUTTON DETEKSI -->
+
+    <button type="submit">
+
+        Deteksi Penyakit
+
+    </button>
+
+</form>
+
+<!-- POPUP -->
+
+<div id="uploadModal" class="upload-modal">
+
+    <div class="upload-modal-content">
+
+        <h3>Pilih Sumber Gambar</h3>
+
+        <button type="button"
+                onclick="openCamera()">
+
+            📷 Ambil Foto
+
+        </button>
+
+        <button type="button"
+                onclick="openGallery()">
+
+            🖼️ Pilih File
+
+        </button>
+
+        <button type="button"
+                onclick="closeModal()">
+
+            ❌ Batal
+
+        </button>
+
+    </div>
+
+</div>
 
             <!-- ERROR -->
 
@@ -251,36 +292,104 @@
 
     <script>
 
-        const imageInput = document.getElementById('imageInput');
-        const selectedFile = document.getElementById('selectedFile');
+let selectedFileObject = null;
 
-        imageInput.addEventListener('change', function () {
+const cameraInput =
+document.getElementById('cameraInput');
 
-            if (this.files.length > 0) {
+const galleryInput =
+document.getElementById('galleryInput');
 
-                selectedFile.innerHTML =
-                    "✅ " + this.files[0].name;
+const selectedFile =
+document.getElementById('selectedFile');
 
-            }
+function openModal(){
 
-        });
+    document.getElementById('uploadModal')
+    .style.display = 'flex';
 
-        document.getElementById('uploadForm')
-            .addEventListener('submit', function () {
+}
 
-                if (imageInput.files.length === 0) {
+function closeModal(){
 
-                    alert('Silakan pilih gambar terlebih dahulu!');
-                    return false;
+    document.getElementById('uploadModal')
+    .style.display = 'none';
 
-                }
+}
 
-                document.getElementById('loading')
-                    .style.display = 'flex';
+function openCamera(){
 
-            });
+    cameraInput.click();
 
-    </script>
+    closeModal();
+
+}
+
+function openGallery(){
+
+    galleryInput.click();
+
+    closeModal();
+
+}
+
+cameraInput.addEventListener('change', function(){
+
+    if(this.files.length > 0){
+
+        selectedFileObject = this.files[0];
+
+        selectedFile.innerHTML =
+        "✅ " + selectedFileObject.name;
+
+    }
+
+});
+
+galleryInput.addEventListener('change', function(){
+
+    if(this.files.length > 0){
+
+        selectedFileObject = this.files[0];
+
+        selectedFile.innerHTML =
+        "✅ " + selectedFileObject.name;
+
+    }
+
+});
+
+document.getElementById('uploadForm')
+.addEventListener('submit', function(e){
+
+    if(!selectedFileObject){
+
+        e.preventDefault();
+
+        alert(
+            'Silakan pilih gambar terlebih dahulu!'
+        );
+
+        return;
+
+    }
+
+    const dataTransfer =
+    new DataTransfer();
+
+    dataTransfer.items.add(
+        selectedFileObject
+    );
+
+    cameraInput.files =
+    dataTransfer.files;
+
+    document.getElementById('loading')
+    .style.display = 'flex';
+
+});
+
+</script>
 
 </body>
 
