@@ -34,18 +34,16 @@
         <h2>LumpyDetect AI</h2>
 
         <ul>
-
-            <li>Beranda</li>
-            <li>Deteksi</li>
-            <li>Informasi</li>
-
-        </ul>
+    <li><a href="#beranda">Beranda</a></li>
+    <li><a href="#deteksi">Deteksi</a></li>
+    <li><a href="#informasi">Informasi</a></li>
+</ul>
 
     </nav>
 
     <!-- HERO -->
 
-    <section class="hero">
+    <section class="hero" id="beranda">
 
         <div class="hero-content">
 
@@ -70,7 +68,7 @@
 
         <!-- UPLOAD -->
 
-        <div class="card upload-section">
+        <div class="card upload-section" id="deteksi">
 
             <h2>Upload Gambar Sapi</h2>
 
@@ -96,9 +94,10 @@
            hidden>
 
     <input type="file"
-           id="galleryInput"
-           accept="image/*"
-           hidden>
+       id="galleryInput"
+       name="image"
+       accept="image/*"
+       hidden>
 
     <!-- TOMBOL UPLOAD -->
 
@@ -211,7 +210,7 @@
 
         <!-- EDUKASI -->
 
-        <div class="info-grid">
+        <div class="info-grid" id="informasi">
 
             <div class="info-box">
 
